@@ -52,16 +52,34 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-/* Specify the memory areas */
+/*
+ * Memory regions: STM32F767ZI, 512 KB SRAM in three blocks
+ * (RM0410 Rev 5, "Memory organization" and "Embedded SRAM").
+ *
+ * DTCM   128 KB  Tightly coupled to the core: zero wait states, never cached.
+ *                DMA1/DMA2 can reach it through the core's AHBS port (F7 only;
+ *                not true on STM32H7). All RAM sections, the main stack and DMA
+ *                buffers live here, so DMA needs no cache maintenance.
+ * SRAM1  368 KB  AXI bus matrix, cacheable (write-back). Unused for now; room
+ *                for large non-DMA buffers if DTCM fills.
+ * SRAM2  16 KB   Same as SRAM1. Reserved for a non-cacheable MPU region if DMA
+ *                buffers outgrow DTCM.
+ *
+ * Changed from CubeMX's single 512 KB "RAM" region: with one region, .bss could
+ * grow out of DTCM into cacheable SRAM1 without warning. With separate regions,
+ * overflowing DTCM is a link error.
+ */
 MEMORY
 {
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 512K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 2048K
+DTCM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
+SRAM1 (xrw)     : ORIGIN = 0x20020000, LENGTH = 368K
+SRAM2 (xrw)     : ORIGIN = 0x2007C000, LENGTH = 16K
+FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 2048K
 }
 
 /* Highest address of the user mode stack */
-_estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
-/* Generate a link error if heap and stack don't fit into RAM */
+_estack = ORIGIN(DTCM) + LENGTH(DTCM);    /* end of DTCM */
+/* Generate a link error if heap and stack don't fit into DTCM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
 _Min_Stack_Size = 0x400; /* required amount of stack */
 
@@ -150,7 +168,7 @@ SECTIONS
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 
-  /* Initialized data sections goes into RAM, load LMA copy after code */
+  /* Initialized data sections goes into DTCM, load LMA copy after code */
   .data :
   {
     . = ALIGN(4);
@@ -161,7 +179,7 @@ SECTIONS
     *(.RamFunc*)       /* .RamFunc* sections */
 
     . = ALIGN(4);
-  } >RAM AT> FLASH
+  } >DTCM AT> FLASH
 
  /* Initialized TLS data section */
   .tdata : ALIGN(4)
@@ -171,7 +189,7 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
     PROVIDE(__data_end = .);
     PROVIDE(__tdata_end = .);
-  } >RAM AT> FLASH
+  } >DTCM AT> FLASH
 
   PROVIDE( __tdata_start = ADDR(.tdata) );
   PROVIDE( __tdata_size = __tdata_end - __tdata_start );
@@ -195,7 +213,7 @@ SECTIONS
     *(.tbss .tbss.*)
     . = ALIGN(4);
     PROVIDE( __tbss_end = . );
-  } >RAM
+  } >DTCM
 
   PROVIDE( __tbss_start = ADDR(.tbss) );
   PROVIDE( __tbss_size = __tbss_end - __tbss_start );
@@ -219,11 +237,32 @@ SECTIONS
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
       PROVIDE( __bss_end = .);
-  } >RAM
+  } >DTCM
   PROVIDE( __non_tls_bss_start = ADDR(.bss) );
 
   PROVIDE( __bss_start = __tbss_start );
   PROVIDE( __bss_size = __bss_end - __bss_start );
+
+  /*
+   * DMA buffers, tagged with BSP_DMA_BUFFER (BSP/Inc/bsp_memory.h). DTCM is
+   * never cached, so DMA here needs no cache maintenance.
+   *
+   * NOLOAD and outside .bss: startup neither copies nor zeroes it, and it takes
+   * no FLASH. The input section name must not match .bss* or .data*, or those
+   * rules above would claim the buffers first.
+   *
+   * ALIGN(32) at both ends is the D-cache line size, so no buffer shares a line
+   * with other data. DTCM doesn't need it; it keeps the section valid if it
+   * moves to cacheable RAM later.
+   */
+  .dma_buffers (NOLOAD) : ALIGN(32)
+  {
+    _sdma_buffers = .;
+    *(.dma_buffers)
+    *(.dma_buffers*)
+    . = ALIGN(32);
+    _edma_buffers = .;
+  } >DTCM
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack (NOLOAD) :
@@ -234,7 +273,7 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
+  } >DTCM
 
 
 
