@@ -53,3 +53,7 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# STM CubeIDE Workspace Metadata
+*.metadata
+/Telescope_Controller/
