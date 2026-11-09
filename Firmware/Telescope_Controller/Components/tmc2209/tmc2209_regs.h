@@ -44,8 +44,42 @@
 #ifndef TMC2209_REG_MAP_H
 #define TMC2209_REG_MAP_H
 
-/* General Configuration Registers 0x00...0x0F */
-#define GNCOF                   0x00
+/* --- Register Addresses --- */
+
+/* General Configuration */
+#define TMC2209_REG_GCONF           0x00U   /* RW, 10-bit */
+#define TMC2209_REG_GSTAT           0x01U   /* RWC, 3-bit */
+#define TMC2209_REG_IFCNT           0x02U   /* R, 8-bit */
+#define TMC2209_REG_NODECONF        0x03U   /* W, 4-bit */
+#define TMC2209_REG_OTP_PROG        0x04U   /* W, 16-bit */
+#define TMC2209_REG_OTP_READ        0x05U   /* R, 24-bit */
+#define TMC2209_REG_OTP_IOIN        0x06U   /* R, 18-bit */
+#define TMC2209_REG_FACTORY_CONF    0x07U   /* RW, 7-bit */
+
+/* Velocity Dependent Control */
+#define TMC2209_REG_IHOLD_IRUN      0x10U   /* W, 14-bit */
+#define TMC2209_REG_TPOWERDOWN      0x11U   /* W, 8-bit */
+#define TMC2209_REG_TSTEP           0x12U   /* R, 20-bit */
+#define TMC2209_REG_TPWMTHRS        0x13U   /* W, 20-bit */
+#define TMC2209_REG_VACTUAL         0x22U   /* W, 24-bit */
+
+/* StallGuard Control */
+#define TMC2209_REG_TCOOLTHRS       0x14U   /* W, 20-bit */
+#define TMC2209_REG_SGTHRS          0x40U   /* W, 8-bit */
+#define TMC2209_REG_SG_RESULT       0x41U   /* R, 10-bit */
+#define TMC2209_REG_COOLCONF        0x42U   /* W, 16-bit */
+
+/* Sequencer Registers */
+#define TMC2209_REG_MSCNT           0x6AU   /* R, 10-bit */
+#define TMC2209_REG_MSCURACT        0x6BU   /* R, 18-bit */
+
+/* Chopper Control Registers */
+#define TMC2209_REG_CHOPCONF        0x6CU   /* RW, 32-bit */
+#define TMC2209_REG_DRV_STATUS      0x6FU   /* R, 32-bit */
+#define TMC2209_REG_PWM_SCALE       0x71U   /* R, 17-bit */
+#define TMC2209_REG_PWM_AUTO        0x72U   /* R, 16-bit */
+
+/* --- GCONF (0x00) --- */
 
 
 
