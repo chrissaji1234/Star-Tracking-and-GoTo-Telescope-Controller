@@ -32,7 +32,7 @@
  *   R/W    read and write
  *   R+WC   read; write 1 to a flag bit to clear it
  *
- * Every register address is listed. For now, bit fields are listed only for 
+ * Every register address is listed. For now, bit fields are listed only for
  * registers the driver uses.
  *
  * All registers reset to 0 at power-up unless the datasheet notes otherwise.
@@ -47,14 +47,14 @@
 /* --- Register Addresses --- */
 
 /* General Configuration */
-#define TMC2209_REG_GCONF           0x00U   /* RW, 10-bit */
-#define TMC2209_REG_GSTAT           0x01U   /* RWC, 3-bit */
+#define TMC2209_REG_GCONF           0x00U   /* R/W, 10-bit */
+#define TMC2209_REG_GSTAT           0x01U   /* R+WC, 3-bit */
 #define TMC2209_REG_IFCNT           0x02U   /* R, 8-bit */
 #define TMC2209_REG_NODECONF        0x03U   /* W, 4-bit */
 #define TMC2209_REG_OTP_PROG        0x04U   /* W, 16-bit */
 #define TMC2209_REG_OTP_READ        0x05U   /* R, 24-bit */
-#define TMC2209_REG_OTP_IOIN        0x06U   /* R, 18-bit */
-#define TMC2209_REG_FACTORY_CONF    0x07U   /* RW, 7-bit */
+#define TMC2209_REG_IOIN            0x06U   /* R, 10+8-bit */
+#define TMC2209_REG_FACTORY_CONF    0x07U   /* R/W, 5+2-bit */
 
 /* Velocity Dependent Control */
 #define TMC2209_REG_IHOLD_IRUN      0x10U   /* W, 14-bit */
@@ -74,13 +74,18 @@
 #define TMC2209_REG_MSCURACT        0x6BU   /* R, 18-bit */
 
 /* Chopper Control Registers */
-#define TMC2209_REG_CHOPCONF        0x6CU   /* RW, 32-bit */
+#define TMC2209_REG_CHOPCONF        0x6CU   /* R/W, 32-bit */
 #define TMC2209_REG_DRV_STATUS      0x6FU   /* R, 32-bit */
+#define TMC2209_REG_PWMCONF         0x70U   /* R/W, 22-bit */
 #define TMC2209_REG_PWM_SCALE       0x71U   /* R, 17-bit */
 #define TMC2209_REG_PWM_AUTO        0x72U   /* R, 16-bit */
 
 /* --- GCONF (0x00) --- */
 
+#define TMC2209_GCONF_I_SCALE_ANALOG_Pos    0U
+#define TMC2209_GCONF_I_SCALE_ANALOG_Msk    (0x1UL << TMC2209_GCONF_I_SCALE_ANALOG_POS)
+#define TMC2209_GCONF_INTERNAL_RSENSE_Pos   1U
+#define TMC2209_GCONF_INTERNAL_RSENSE_Msk   (0x1UL << TMC2209_GCONF_INTERNAL_RSENSE_POS)
 
 
 
