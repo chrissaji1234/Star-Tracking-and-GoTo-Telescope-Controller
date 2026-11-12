@@ -41,8 +41,8 @@
  * part of the UART datagram, so tmc2209.c adds it.
  *
  */
-#ifndef TMC2209_REG_MAP_H
-#define TMC2209_REG_MAP_H
+#ifndef TMC2209_REGS_H
+#define TMC2209_REGS_H
 
 /* --- Register Addresses --- */
 
@@ -57,7 +57,7 @@
 #define TMC2209_REG_FACTORY_CONF    0x07U   /* R/W, 5+2-bit */
 
 /* Velocity Dependent Control */
-#define TMC2209_REG_IHOLD_IRUN      0x10U   /* W, 14-bit */
+#define TMC2209_REG_IHOLD_IRUN      0x10U   /* W, 5+5+4-bit */
 #define TMC2209_REG_TPOWERDOWN      0x11U   /* W, 8-bit */
 #define TMC2209_REG_TSTEP           0x12U   /* R, 20-bit */
 #define TMC2209_REG_TPWMTHRS        0x13U   /* W, 20-bit */
@@ -71,21 +71,53 @@
 
 /* Sequencer Registers */
 #define TMC2209_REG_MSCNT           0x6AU   /* R, 10-bit */
-#define TMC2209_REG_MSCURACT        0x6BU   /* R, 18-bit */
+#define TMC2209_REG_MSCURACT        0x6BU   /* R, 9+9-bit */
 
 /* Chopper Control Registers */
 #define TMC2209_REG_CHOPCONF        0x6CU   /* R/W, 32-bit */
 #define TMC2209_REG_DRV_STATUS      0x6FU   /* R, 32-bit */
 #define TMC2209_REG_PWMCONF         0x70U   /* R/W, 22-bit */
-#define TMC2209_REG_PWM_SCALE       0x71U   /* R, 17-bit */
-#define TMC2209_REG_PWM_AUTO        0x72U   /* R, 16-bit */
+#define TMC2209_REG_PWM_SCALE       0x71U   /* R, 9+8-bit */
+#define TMC2209_REG_PWM_AUTO        0x72U   /* R, 8+8-bit */
 
 /* --- GCONF (0x00) --- */
+/* Doesn't reset to 0: I_SCALE_ANALOG and MULTISTEP_FILT reset to 1, and
+ * INTERNAL_RSENSE and EN_SPREAD_CYCLE are loaded from OTP. */
+#define TMC2209_GCONF_I_SCALE_ANALOG_Pos    (0U)
+#define TMC2209_GCONF_I_SCALE_ANALOG_Msk    (0x1UL << TMC2209_GCONF_I_SCALE_ANALOG_Pos)
+#define TMC2209_GCONF_INTERNAL_RSENSE_Pos   (1U)
+#define TMC2209_GCONF_INTERNAL_RSENSE_Msk   (0x1UL << TMC2209_GCONF_INTERNAL_RSENSE_Pos)
+#define TMC2209_GCONF_EN_SPREAD_CYCLE_Pos   (2U)
+#define TMC2209_GCONF_EN_SPREAD_CYCLE_Msk   (0x1UL << TMC2209_GCONF_EN_SPREAD_CYCLE_Pos)
+#define TMC2209_GCONF_SHAFT_Pos             (3U)
+#define TMC2209_GCONF_SHAFT_Msk             (0x1UL << TMC2209_GCONF_SHAFT_Pos)
+#define TMC2209_GCONF_INDEX_OTPW_Pos        (4U)
+#define TMC2209_GCONF_INDEX_OTPW_Msk        (0x1UL << TMC2209_GCONF_INDEX_OTPW_Pos)
+#define TMC2209_GCONF_INDEX_STEP_Pos        (5U)
+#define TMC2209_GCONF_INDEX_STEP_Msk        (0x1UL << TMC2209_GCONF_INDEX_STEP_Pos)
+#define TMC2209_GCONF_PDN_DISABLE_Pos       (6U)
+#define TMC2209_GCONF_PDN_DISABLE_Msk       (0x1UL << TMC2209_GCONF_PDN_DISABLE_Pos)
+#define TMC2209_GCONF_MSTEP_REG_SELECT_Pos  (7U)
+#define TMC2209_GCONF_MSTEP_REG_SELECT_Msk  (0x1UL << TMC2209_GCONF_MSTEP_REG_SELECT_Pos)
+#define TMC2209_GCONF_MULTISTEP_FILT_Pos    (8U)
+#define TMC2209_GCONF_MULTISTEP_FILT_Msk    (0x1UL << TMC2209_GCONF_MULTISTEP_FILT_Pos)
+#define TMC2209_GCONF_TEST_MODE_Pos         (9U)
+#define TMC2209_GCONF_TEST_MODE_Msk         (0x1UL << TMC2209_GCONF_TEST_MODE_Pos)
 
-#define TMC2209_GCONF_I_SCALE_ANALOG_Pos    0U
-#define TMC2209_GCONF_I_SCALE_ANALOG_Msk    (0x1UL << TMC2209_GCONF_I_SCALE_ANALOG_POS)
-#define TMC2209_GCONF_INTERNAL_RSENSE_Pos   1U
-#define TMC2209_GCONF_INTERNAL_RSENSE_Msk   (0x1UL << TMC2209_GCONF_INTERNAL_RSENSE_POS)
+/* --- GSTAT (0x01) --- */
+#define TMC2209_GSTAT_RESET_Pos             (0U)
+#define TMC2209_GSTAT_RESET_Msk             (0x1UL << TMC2209_GSTAT_RESET_Pos)
+#define TMC2209_GSTAT_DRV_ERR_Pos           (1U)
+#define TMC2209_GSTAT_DRV_ERR_Msk           (0x1UL << TMC2209_GSTAT_DRV_ERR_Pos)
+#define TMC2209_GSTAT_UV_CP_Pos             (2U)
+#define TMC2209_GSTAT_UV_CP_Msk             (0x1UL << TMC2209_GSTAT_UV_CP_Pos)
+
+/* --- IFCNT (0x02) --- */
+/* No bit fields */
+
+/* --- NODECONF (0x03) --- */
+#define TMC2209_NODECONF_SENDDELAY_Pos      (8U)
+#define TMC2209_NODECONF_SENDDELAY_Msk      (0xFUL << TMC2209_NODECONF_SENDDELAY_Pos)
 
 
 
@@ -107,4 +139,5 @@
 
 
 
-#endif /* TMC2209_REG_MAP_H */
+
+#endif /* TMC2209_REGS_H */
